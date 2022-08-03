@@ -1,0 +1,61 @@
+==== REDIRECT NOT FOUND PAGE TO HOME PAGE ====
+<?php
+header("HTTP/1.1 301 Moved Permanently");
+header("Location: ".get_bloginfo('url'));
+exit();
+?>
+
+==== EDIT WOOCOMERCE FILES ====
+--STEP 1 --
+ADD WOOMERCE THEME SUPPORT IN FUNCTION FILE
+
+function mytheme_add_woocommerce_support() {
+	add_theme_support( 'woocommerce' );
+}
+add_action( 'after_setup_theme', 'mytheme_add_woocommerce_support' );
+
+
+-- STEP 2 --
+Edit files in an upgrade-safe way using overrides. Copy the template into a directory within your theme named /woocommerce keeping the same file structure but removing the /templates/ subdirectory.
+Example: To override the admin order notification, copy: wp-content/plugins/woocommerce/templates/emails/admin-new-order.php to wp-content/themes/yourtheme/woocommerce/emails/admin-new-order.php
+
+Warning: Do not edit these files within the core plugin itself as they are overwritten during the upgrade process and any customizations will be lost. 
+
+-LINK FOR MORE INFORMATION-
+
+https://woocommerce.com/document/template-structure/
+
+==== DISPLAY ALL PRODUCTS IN OWL CAROUSEL WOOCOMMERCE ====
+<ul class="slides">
+  <div class="product-carousel owl-carousel owl-theme ">
+    <?php 
+      $args = array(
+          'post_type'      => 'product',
+          'posts_per_page' => 10,
+          'order'    => 'ASC',
+      );
+      $loop = new WP_Query( $args );
+      while ( $loop->have_posts() ) : $loop->the_post()
+          global $product;?>
+          <div class="img-box">
+              <a href="<?php echo get_permalink( $product->get_id() ); ?>">
+                  <div class="products-images">
+                      <?php echo $product->get_image(); ?>
+                  </div>
+              </a>
+              <a href="<?php echo get_permalink( $product->get_id() ); ?>"> 
+              <h4><?php echo $product->get_title() ?></h4>
+              <p><?php echo $product->get_short_description(); ?></p>
+              </a>
+                <div class="price-btn">
+                    <span><?php echo $product->get_price_html(); ?></span>
+                    <a href="<?php echo get_permalink( $product->get_id() ); ?>" class="btn-add-to-cart"><span class="icons"></span>ADD TO CART</a>
+
+                </div>
+              </div>
+      <?php
+      endwhile;
+      wp_reset_query();
+  ?>
+</div>
+</ul>
